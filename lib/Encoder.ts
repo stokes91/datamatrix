@@ -268,11 +268,7 @@ export class Encoder {
         unpacked.push(0x1e); // Hibit
         unpacked.push(byte - 0x80);
       }
-    
     }
-
-    console.log(data.split(''));
-    console.log(unpacked);
 
     if (this.mode !== Encoding.TEXT && this.mode !== Encoding.ASCII) {
       this.array.push(0xfe);

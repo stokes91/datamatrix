@@ -11,9 +11,6 @@
    limitations under the License.
 */
 
-
-import { factory } from "./lib/factory.ts";
-
 import { Encoding, Encoder } from "./lib/Encoder.ts";
 
-export { Encoding, Encoder, factory };
+export { Encoding, Encoder };
