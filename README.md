@@ -23,3 +23,20 @@ await Deno.writeFile(
 );  // 351 bytes
 
 ```
+
+There are other encodings available:
+encodeText, encodeC40, encodeX12 and encodeAscii.
+
+All except X12 may accept any ASCII character and this code will do the apropriate work to 
+get a desired character. In general, if you're working with mostly lower-case text, use Text;
+and use C40 for mostly upper-case text; The number of 'shifts' to different character sets
+will be reduced.
+
+## X12
+```
+symbols.encodeX12(`216638618-31C103BD-B328-4276-B4BE-0EBD1FD95CBB`);
+// Important: Hyphens will be dropped.
+```
+X12 has the most limitations and it may be suitable for unique id or product codes
+keeping in mind the characters may not fall outside the specification, and this library will 
+silently drop them if provided.
