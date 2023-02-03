@@ -13,7 +13,7 @@
 
 import { SizedLayout } from "./SizedLayout.ts";
 import { Coord } from "./Coord.ts";
-import { GaloisField, ReedSolomonEncoder } from "./ReedSolomon/mod.ts";
+import { GaloisField, ReedSolomonEncoder } from "https://deno.land/x/reed_solomon@v2.3.3/mod.ts";
 
 import { CompressedMonochromeGif } from "./CompressedMonochromeGif.ts";
 
