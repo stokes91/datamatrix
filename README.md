@@ -11,7 +11,7 @@ Example to create the barcode above: (from test/repoUrl.ts)
 
 // Generates a barcode for use in the README.md
 
-import { Encoder } from "../mod.ts";
+import { Encoder } from "https://deno.land/x/data_matrix/mod.ts";
 
 const symbols = new Encoder();
 
