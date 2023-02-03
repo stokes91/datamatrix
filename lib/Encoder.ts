@@ -328,7 +328,14 @@ export class Encoder {
       this.array.splice(0, this.array.length - SymbolSizes[l].capacity);
     }
 
-    Object.assign(this, SymbolSizes[l]);
+    const symbolInfo : SymbolInfo = SymbolSizes[l];
+
+    this.capacity = symbolInfo.capacity;
+    this.ecc = symbolInfo.ecc;
+    this.edgeLength = symbolInfo.edgeLength;
+    this.moduleSqd = symbolInfo.moduleSqd;
+    this.blocks = symbolInfo.blocks;
+    this.blockSize = symbolInfo.blockSize;
 
     return this;
   }
