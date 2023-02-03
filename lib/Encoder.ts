@@ -31,6 +31,8 @@ const DATAMATRIX_FIELD = new GaloisField(0x100, 0x12d, 2);
 const LAYOUT_CACHE: Array<SizedLayout> = [];
 const ENCODER_CACHE: Array<ReedSolomonEncoder> = [];
 
+const THROW_X12_ERRORS = false;
+
 // capacity, ecc, edgeLength, moduleSqd, blocks
 
 const SymbolSizes = [
@@ -73,10 +75,12 @@ function ToX12(byte: number) {
     return 0x03;
   } else if (byte === 0x0d) {
     return 0x00;
-  } else {
+  } else if (THROW_X12_ERRORS){
     throw new Error(
       "Unexpected byte 0x" + byte.toString(16) + " in X12 Encoding",
     );
+  } else {
+    return 0xff;
   }
 }
 
@@ -306,7 +310,13 @@ export class Encoder {
     }
 
     for (let i = 0; i < data.length; i += 3) {
-      let v = 0x640 * ToX12(data.charCodeAt(i)) + 1;
+      let v = ToX12(data.charCodeAt(i));
+      if (v == 0xff) {
+        i -= 2;
+        continue;
+      }
+      
+      v = 0x640 * v + 1;
       if (i + 1 < data.length) v += 0x28 * ToX12(data.charCodeAt(i + 1));
       if (i + 2 < data.length) v += ToX12(data.charCodeAt(i + 2));
 
