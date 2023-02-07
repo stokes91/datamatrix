@@ -20,12 +20,12 @@ const symbols = new Encoder();
 
 symbols.encodeX12(`T3\r`)
   .encodeAscii(`\n!"#$%&'()*+,-./0123456789:;<=>?@`) // 1 character per symbol
-  .encodeC40(`ABCDEFGHIJKLMNOPQRSTUVWXYZ`)    // 3 characters per symbol
+  .encodeC40(`ABCDEFGHIJKLMNOPQRSTUVWXYZ`) // 3 characters per symbol
   .encodeAscii(`[\\]^_\``)
   .encodeText(`abcdefghijklmnopqrstuvwxyz`)
   .encodeAscii(`{|}~`);
 
 await Deno.writeFile(
- 'mixedEncodingResult.gif',
- symbols.selectSymbolDimensions().generateEcc().toByteArray()
-);  // 731 bytes.
+  "mixedEncodingResult.gif",
+  symbols.selectSymbolDimensions().generateEcc().toByteArray(),
+); // 731 bytes.

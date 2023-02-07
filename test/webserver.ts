@@ -15,7 +15,7 @@
 //
 // This will save a gif encoding of the requested chl query parameter.
 
-import {Encoder} from "../mod.ts";
+import { Encoder } from "../mod.ts";
 
 // Based on the base Deno webserver.ts example at
 // https://deno.land/manual@v1.30.0/examples/http_server
@@ -24,7 +24,6 @@ const server = Deno.listen({ port: 8080 });
 console.log(`HTTP webserver running.  Access it at:  http://localhost:8080/`);
 
 for await (const conn of server) {
-
   serveHttp(conn);
 }
 
@@ -32,20 +31,19 @@ async function serveHttp(conn: Deno.Conn) {
   const httpConn = Deno.serveHttp(conn);
 
   for await (const requestEvent of httpConn) {
-
     const url = new URL(requestEvent.request.url);
     console.log("Path:", url.pathname);
     console.log("Query parameters:", url.searchParams);
 
-    const chl = url.searchParams.get('chl');
+    const chl = url.searchParams.get("chl");
 
     if (!chl) {
       requestEvent.respondWith(
-        new Response('Expected data for the barcode in the form ?chl=<data>', {
+        new Response("Expected data for the barcode in the form ?chl=<data>", {
           status: 400,
           headers: {
-            'content-type': 'text/plain'
-          }
+            "content-type": "text/plain",
+          },
         }),
       );
       return;
@@ -61,7 +59,7 @@ async function serveHttp(conn: Deno.Conn) {
       symbols.encodeC40(data);
     } else if (/^[a-z\d]{1,}$/.test(data)) {
       symbols.encodeText(data);
-    } else {  // More complicated swapping between character sets is possible.
+    } else { // More complicated swapping between character sets is possible.
       symbols.encodeAscii(data);
     }
 
@@ -71,8 +69,8 @@ async function serveHttp(conn: Deno.Conn) {
       new Response(body, {
         status: 200,
         headers: {
-          'content-type': 'image/gif'
-        }
+          "content-type": "image/gif",
+        },
       }),
     );
   }

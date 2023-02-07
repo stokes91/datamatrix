@@ -96,7 +96,6 @@ export class SizedLayout {
   }
 
   push(array: Array<Coord>) {
-
     array.forEach((coord) => {
       if (coord.y < 0) {
         coord.y += this.height;
@@ -111,7 +110,6 @@ export class SizedLayout {
       this.pixelCluster.push(coord);
       this.emptyBits[coord.y * this.width + coord.x] = false;
     });
-
 
     return this;
   }

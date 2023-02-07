@@ -11,6 +11,6 @@
    limitations under the License.
 */
 
-import { Encoding, Encoder } from "./lib/Encoder.ts";
+import { Encoder, Encoding } from "./lib/Encoder.ts";
 
-export { Encoding, Encoder };
+export { Encoder, Encoding };

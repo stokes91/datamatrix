@@ -20,6 +20,6 @@ const symbols = new Encoder();
 symbols.encodeText(`https://github.com/stokes91/deno-data-matrix`);
 
 await Deno.writeFile(
- 'repoUrlResult.gif',
- symbols.selectSymbolDimensions().generateEcc().toByteArray()
-);  // 351 bytes
+  "repoUrlResult.gif",
+  symbols.selectSymbolDimensions().generateEcc().toByteArray(),
+); // 351 bytes

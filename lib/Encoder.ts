@@ -13,7 +13,10 @@
 
 import { SizedLayout } from "./SizedLayout.ts";
 import { Coord } from "./Coord.ts";
-import { GaloisField, ReedSolomonEncoder } from "https://deno.land/x/reed_solomon@v2.3.3/mod.ts";
+import {
+  GaloisField,
+  ReedSolomonEncoder,
+} from "https://deno.land/x/reed_solomon@v2.3.3/mod.ts";
 
 import { CompressedMonochromeGif } from "./CompressedMonochromeGif.ts";
 
@@ -75,7 +78,7 @@ function ToX12(byte: number) {
     return 0x03;
   } else if (byte === 0x0d) {
     return 0x00;
-  } else if (THROW_X12_ERRORS){
+  } else if (THROW_X12_ERRORS) {
     throw new Error(
       "Unexpected byte 0x" + byte.toString(16) + " in X12 Encoding",
     );
@@ -166,41 +169,32 @@ export class Encoder {
   }
 
   encodeC40(data: string) {
-
     const unpacked = [];
     for (let i = 0; i < data.length; i += 1) {
       const byte = data.charCodeAt(i);
 
       if (byte == 0x20) {
         unpacked.push(0x03);
-      }
-      else if (byte >= 0x30 && byte <= 0x39) {
-        unpacked.push(byte - 0x30 + 4);     // 0x30 - 0x39 begin at 4.
-      }
-      else if (byte >= 0x41 && byte <= 0x5a) {
-        unpacked.push(byte - 0x41 + 14);    // 0x41 - 0x5a begin at 14.
-      }
-      else if (byte < 0x20) {   // ' '
+      } else if (byte >= 0x30 && byte <= 0x39) {
+        unpacked.push(byte - 0x30 + 4); // 0x30 - 0x39 begin at 4.
+      } else if (byte >= 0x41 && byte <= 0x5a) {
+        unpacked.push(byte - 0x41 + 14); // 0x41 - 0x5a begin at 14.
+      } else if (byte < 0x20) { // ' '
         unpacked.push(0x00);
         unpacked.push(byte);
-      }
-      else if (byte <= 0x2f) {  // '/' 
+      } else if (byte <= 0x2f) { // '/'
         unpacked.push(0x01);
-        unpacked.push(byte - 0x21);         // 0x21 - 0x2f begin at 0
-      }
-      else if (byte <= 0x40) {  // '@'
+        unpacked.push(byte - 0x21); // 0x21 - 0x2f begin at 0
+      } else if (byte <= 0x40) { // '@'
         unpacked.push(0x01);
-        unpacked.push(byte - 0x3a + 15);    // 0x3a - 0x40 begin at 15
-      }
-      else if (byte <= 0x5f) {  //  '_'
+        unpacked.push(byte - 0x3a + 15); // 0x3a - 0x40 begin at 15
+      } else if (byte <= 0x5f) { //  '_'
         unpacked.push(0x01);
-        unpacked.push(byte - 0x5b + 22);    // 0x5b - 0x5f begin at 22
-      }
-      else if (byte <= 0x7f) {
+        unpacked.push(byte - 0x5b + 22); // 0x5b - 0x5f begin at 22
+      } else if (byte <= 0x7f) {
         unpacked.push(0x02);
         unpacked.push(byte - 0x60);
-      }
-      else {
+      } else {
         unpacked.push(0x01);
         unpacked.push(0x1e); // Hibit
         unpacked.push(byte - 0x80);
@@ -236,38 +230,29 @@ export class Encoder {
 
       if (byte == 0x20) {
         unpacked.push(0x03);
-      }
-      else if (byte >= 0x30 && byte <= 0x39) {
-        unpacked.push(byte - 0x30 + 4);     // 0x30 - 0x39 begin at 4.
-      }
-      else if (byte >= 0x61 && byte <= 0x7a) {
-        unpacked.push(byte - 0x61 + 14);    // 0x61 - 0x7a begin at 14.
-      }
-      else if (byte < 0x20) { // ' '
+      } else if (byte >= 0x30 && byte <= 0x39) {
+        unpacked.push(byte - 0x30 + 4); // 0x30 - 0x39 begin at 4.
+      } else if (byte >= 0x61 && byte <= 0x7a) {
+        unpacked.push(byte - 0x61 + 14); // 0x61 - 0x7a begin at 14.
+      } else if (byte < 0x20) { // ' '
         unpacked.push(0x00);
         unpacked.push(byte);
-      }
-      else if (byte <= 0x2f) {  // '/'
+      } else if (byte <= 0x2f) { // '/'
         unpacked.push(0x01);
-        unpacked.push(byte - 0x21);         // 0x21 - 0x2f begin at 0
-      }
-      else if (byte <= 0x40) {  // '@'
+        unpacked.push(byte - 0x21); // 0x21 - 0x2f begin at 0
+      } else if (byte <= 0x40) { // '@'
         unpacked.push(0x01);
-        unpacked.push(byte - 0x3a + 15);    // 0x3a - 0x40 begin at 15
-      }
-      else if (byte >= 0x5b && byte <= 0x5f) {  // '[' '_'
+        unpacked.push(byte - 0x3a + 15); // 0x3a - 0x40 begin at 15
+      } else if (byte >= 0x5b && byte <= 0x5f) { // '[' '_'
         unpacked.push(0x01);
-        unpacked.push(byte - 0x5b + 22);    // 0x5b - 0x5f begin at 22
-      }
-      else if (byte == 0x60) {  // '`'
+        unpacked.push(byte - 0x5b + 22); // 0x5b - 0x5f begin at 22
+      } else if (byte == 0x60) { // '`'
         unpacked.push(0x02);
-        unpacked.push(0x00);                // 0x60 begins at 0
-      }
-      else if (byte <= 0x5a) {  // 0x5a 
+        unpacked.push(0x00); // 0x60 begins at 0
+      } else if (byte <= 0x5a) { // 0x5a
         unpacked.push(0x02);
-        unpacked.push(byte - 0x41 + 1);     // 0x41 - 0x5a begin at 1
-      }
-      else {
+        unpacked.push(byte - 0x41 + 1); // 0x41 - 0x5a begin at 1
+      } else {
         unpacked.push(0x01);
         unpacked.push(0x1e); // Hibit
         unpacked.push(byte - 0x80);
@@ -294,8 +279,6 @@ export class Encoder {
     }
 
     return this;
-
-
   }
 
   encodeX12(data: string) {
@@ -315,7 +298,7 @@ export class Encoder {
         i -= 2;
         continue;
       }
-      
+
       v = 0x640 * v + 1;
       if (i + 1 < data.length) v += 0x28 * ToX12(data.charCodeAt(i + 1));
       if (i + 2 < data.length) v += ToX12(data.charCodeAt(i + 2));
@@ -338,7 +321,7 @@ export class Encoder {
       this.array.splice(0, this.array.length - SymbolSizes[l].capacity);
     }
 
-    const symbolInfo : SymbolInfo = SymbolSizes[l];
+    const symbolInfo: SymbolInfo = SymbolSizes[l];
 
     this.capacity = symbolInfo.capacity;
     this.ecc = symbolInfo.ecc;
@@ -403,15 +386,14 @@ export class Encoder {
     return this;
   }
 
-
   toByteArray() {
     const pixels = new CompressedMonochromeGif(
-      this.moduleSqd * (this.edgeLength + 2)
+      this.moduleSqd * (this.edgeLength + 2),
     );
 
     // Timing Pattern
-    for (let x = this.moduleSqd; x--; ) {
-      for (let y = this.moduleSqd; y--; ) {
+    for (let x = this.moduleSqd; x--;) {
+      for (let y = this.moduleSqd; y--;) {
         // Single Cell at Left Bottom of module
         const px = x * (this.edgeLength + 2);
         const py = (y + 1) * (this.edgeLength + 2) - 1;
@@ -419,13 +401,13 @@ export class Encoder {
         pixels.draw(new Coord(px, py));
 
         // Solid Lines Left and Bottom
-        for (let l = this.edgeLength + 2; l--; ) {
+        for (let l = this.edgeLength + 2; l--;) {
           pixels.draw(new Coord(px, py - l));
           pixels.draw(new Coord(px + l, py));
         }
 
         // Dotted Cells Top and Right
-        for (let l = this.edgeLength + 2; (l -= 2); ) {
+        for (let l = this.edgeLength + 2; (l -= 2);) {
           pixels.draw(new Coord(px + this.edgeLength + 1, py - l));
           pixels.draw(new Coord(px + l, py - this.edgeLength - 1));
         }
