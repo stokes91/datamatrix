@@ -18,7 +18,7 @@ import {
   ReedSolomonEncoder,
 } from "https://deno.land/x/reed_solomon@v2.3.3/mod.ts";
 
-import { CompressedMonochromeGif } from "./CompressedMonochromeGif.ts";
+import { MonochromeGIF } from "./MonochromeGIF.ts";
 
 export const Encoding = {
   ASCII: 0,
@@ -387,7 +387,7 @@ export class Encoder {
   }
 
   toByteArray() {
-    const pixels = new CompressedMonochromeGif(
+    const pixels = new MonochromeGIF(
       this.moduleSqd * (this.edgeLength + 2),
     );
 
@@ -427,19 +427,14 @@ export class Encoder {
       const currentSymbol = this.array[i];
 
       for (let j = 0; j < 8; j++) {
-
         if (((currentSymbol >>> j) & 1) !== 0) {
-
           const coord = sizedLayout.pixelCluster[i * 8 + j];
           const xOffset = Math.floor(coord.x / this.edgeLength) * 2;
           const yOffset = Math.floor(coord.y / this.edgeLength) * 2;
 
           pixels.draw(new Coord(coord.x + xOffset + 1, coord.y + yOffset + 1));
-
         }
-
       }
-
     }
 
     if (sizedLayout.hasUnusedSpace) {
@@ -447,8 +442,6 @@ export class Encoder {
       pixels.draw(new Coord(edgeLength - 1, edgeLength - 1));
     }
 
-    pixels.end();
-
-    return pixels.byteArray;
+    return pixels.toByteArray();
   }
 }
