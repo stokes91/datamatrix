@@ -19,7 +19,7 @@ symbols.encodeText(`https://github.com/stokes91/deno-data-matrix`);
 
 await Deno.writeFile(
  'repoUrlResult.gif',
- symbols.selectSymbolDimensions().generateEcc().toByteArray()
+ symbols.toGIF()
 );  // 351 bytes
 ```
 
