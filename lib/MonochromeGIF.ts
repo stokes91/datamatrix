@@ -11,13 +11,9 @@
    limitations under the License.
 */
 
+import { MonochromeGIFFrameEncoder } from "./MonochromeGIFFrameEncoder.ts";
 import { Coord } from "./Coord.ts";
-
-const EOI_CODE = 5;
-const CLEAR_CODE = 4;
-const CODE_MASK = 3;
-const MIN_CODE_SIZE = 2;
-const ENDING_BYTE = 0x3B;
+import { DrawInterface } from "./DrawInterface.ts";
 
 const GIFMagicNumbers: Array<number> = [
   0x47,
@@ -33,130 +29,17 @@ const GIFMagicNumbers: Array<number> = [
   0x80,
   0x01,
   0x00,
-  0x00,
-  0x00,
-  0x00,
-  0xFF,
-  0xFF,
-  0xFF,
-  0x2C,
 ];
 
-class CodeTable {
-  array: Array<number>;
-  index: Array<number>;
-
-  constructor() {
-    this.array = [];
-    this.index = [];
-  }
-  indexOf(key: number) {
-    return this.index.indexOf(key);
-  }
-  push(key: number, value: number) {
-    this.index.push(key);
-    this.array.push(value);
-  }
-  clear() {
-    this.index.splice(0, this.index.length);
-    this.array.splice(0, this.array.length);
-  }
-}
-
-class MonochromeGIFFrameEncoder {
-  subBlock: number;
-  p: number;
-  codeSize: number;
-  clearCode: number;
-  nextCode: number;
-  cur: number;
-  curShift: number;
-  edgeLength: number;
-  byteArray: Uint8Array;
-
-  constructor(edgeLength: number, byteArray: Uint8Array) {
-    this.subBlock = 1 + 29;
-    this.p = 0;
-    this.codeSize = MIN_CODE_SIZE + 1;
-    this.clearCode = 1 << MIN_CODE_SIZE;
-    this.nextCode = EOI_CODE + 1;
-    this.cur = 0;
-    this.curShift = 0;
-    this.edgeLength = edgeLength;
-    this.byteArray = byteArray;
-  }
-
-  writeBytes(size: number) {
-    while (this.curShift >= size) {
-      this.byteArray[this.p++] = this.cur & 0xff;
-      this.cur >>= 8;
-      this.curShift -= 8;
-      if (this.p === this.subBlock + 0x100) {
-        this.byteArray[this.subBlock] = 0xff;
-        this.subBlock = this.p++;
-      }
-    }
-  }
-
-  emitCode(code: number) {
-    this.cur |= code << this.curShift;
-    this.curShift += this.codeSize;
-    this.writeBytes(8);
-  }
-
-  encodeFrame(position: number, frame: Array<number>) {
-    const codeTable = new CodeTable();
-
-    this.p = position;
-
-    this.byteArray[this.p++] = MIN_CODE_SIZE;
-    this.p++;
-
-    let lastCode = frame[0] & CODE_MASK;
-    this.emitCode(CLEAR_CODE);
-    for (let i = 1; i < frame.length; i++) {
-      const byte = frame[i];
-      const key = (lastCode << 8) | byte;
-      const pos = codeTable.indexOf(key);
-      if (!~pos) {
-        this.emitCode(lastCode);
-        if (this.nextCode === 0x1000) {
-          this.emitCode(CLEAR_CODE);
-          this.nextCode = EOI_CODE + 1;
-          this.codeSize = MIN_CODE_SIZE + 1;
-          codeTable.clear();
-        } else {
-          if (this.nextCode >= 1 << this.codeSize) ++this.codeSize;
-          codeTable.push(key, this.nextCode++);
-        }
-        lastCode = byte;
-      } else {
-        lastCode = codeTable.array[pos];
-      }
-    }
-
-    this.emitCode(lastCode);
-    this.emitCode(EOI_CODE);
-    this.writeBytes(1);
-    if (this.subBlock + 1 === this.p) {
-      this.byteArray[this.subBlock] = 0;
-    } else {
-      this.byteArray[this.subBlock] = this.p - this.subBlock - 1;
-      this.byteArray[this.p++] = 0;
-    }
-
-    this.byteArray[this.p++] = ENDING_BYTE;
-    this.byteArray = this.byteArray.slice(0, this.p);
-  }
-}
-
-export class MonochromeGIF {
+export class MonochromeGIF implements DrawInterface {
   frame: Array<number>;
   edgeLength: number;
+  inverted: boolean;
 
-  constructor(edgeLength: number) {
+  constructor(edgeLength: number, inverted?: boolean) {
     this.edgeLength = edgeLength;
     this.frame = new Array(this.edgeLength * this.edgeLength * 4).fill(1);
+    this.inverted = inverted || false;
   }
 
   draw(coord: Coord) {
@@ -175,10 +58,22 @@ export class MonochromeGIF {
       this.edgeLength * this.edgeLength * 4 + 29,
     );
 
-    for (let i = 0; i < 20; i++) {
+    // Copy the header verbatim
+    for (let i = 0; i < 13; i++) {
       byteArray[i] = GIFMagicNumbers[i];
     }
 
+    // Write the color pallet
+    for (let i = 13; i < 16; i++) {
+      byteArray[i] = this.inverted ? 0xFF : 0x00;
+    }
+    for (let i = 16; i < 19; i++) {
+      byteArray[i] = this.inverted ? 0x00 : 0xFF;
+    }
+
+    byteArray[19] = 0x2C;
+
+    // Image size placed in four offsets.
     const imageDim = this.edgeLength * 2;
     const szLo = imageDim & 0xff;
     const szHi = imageDim >>> 8;

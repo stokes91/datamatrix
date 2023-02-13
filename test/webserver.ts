@@ -63,7 +63,7 @@ async function serveHttp(conn: Deno.Conn) {
       symbols.encodeAscii(data);
     }
 
-    const body = symbols.selectSymbolDimensions().generateEcc().toByteArray();
+    const body = symbols.toGIF();
 
     requestEvent.respondWith(
       new Response(body, {

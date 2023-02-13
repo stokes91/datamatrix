@@ -27,5 +27,5 @@ symbols.encodeX12(`T3\r`)
 
 await Deno.writeFile(
   "mixedEncodingResult.gif",
-  symbols.selectSymbolDimensions().generateEcc().toByteArray(),
+  symbols.toGIF(),
 ); // 731 bytes.

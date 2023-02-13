@@ -11,15 +11,23 @@
    limitations under the License.
 */
 
-// Generates a barcode for use in the README.md
+export class CodeTable {
+  array: Array<number>;
+  index: Array<number>;
 
-import { Encoder } from "../mod.ts";
-
-const symbols = new Encoder();
-
-symbols.encodeText(`https://github.com/stokes91/deno-data-matrix`);
-
-await Deno.writeFile(
-  "repoUrlResult.gif",
-  symbols.toGIF(),
-); // 351 bytes
+  constructor() {
+    this.array = [];
+    this.index = [];
+  }
+  indexOf(key: number) {
+    return this.index.indexOf(key);
+  }
+  push(key: number, value: number) {
+    this.index.push(key);
+    this.array.push(value);
+  }
+  clear() {
+    this.index.splice(0, this.index.length);
+    this.array.splice(0, this.array.length);
+  }
+}

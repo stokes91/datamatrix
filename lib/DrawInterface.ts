@@ -11,15 +11,8 @@
    limitations under the License.
 */
 
-// Generates a barcode for use in the README.md
+import { Coord } from "./Coord.ts";
 
-import { Encoder } from "../mod.ts";
-
-const symbols = new Encoder();
-
-symbols.encodeText(`https://github.com/stokes91/deno-data-matrix`);
-
-await Deno.writeFile(
-  "repoUrlResult.gif",
-  symbols.toGIF(),
-); // 351 bytes
+export interface DrawInterface {
+  draw(_: Coord): void;
+}
